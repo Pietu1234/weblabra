@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pankki tili</title>
+  </head>
+  <body>
+    <h1>Tili</h1>
+    <form>
+      <label>Tili numero:</label>
+      <input type="text" id="accountNumber"><br><br>
+      <button type="button" onclick="createAccount()">Luo Käyttäjä</button>
+    </form>
+    <br><br>
+    <form>
+      <label>Summa:</label>
+      <input type="number" id="amount"><br><br>
+      <button type="button" onclick="deposit()">Talleta</button>
+      <button type="button" onclick="withdraw()">Nosta</button>
+    </form>
+    <br><br>
+    <button type="button" onclick="displayInfo()">Info</button>
+    <button type="button" onclick="displayHistory()">Historia</button>
+    <br><br>
+    <div id="output"></div>
+  </body>
+  <script>
+    let account;
+
+    function createAccount() {
+      const accountNumber = document.getElementById('accountNumber').value;
+      account = new BankAccount(accountNumber);
+      displayMessage('Account created');
+    }
+
+    function deposit() {
+      const amount = parseFloat(document.getElementById('amount').value);
+      account.deposit(amount);
+      displayMessage(`${amount} deposited`);
+    }
+
+    function withdraw() {
+      const amount = parseFloat(document.getElementById('amount').value);
+      account.withdraw(amount);
+      displayMessage(`${amount} withdrawn`);
+    }
+
+    function displayInfo() {
+      let message = `Account number: ${account.accountNumber}`;
+      message += `<br>Balance: ${account.balance}`;
+      message += '<br>History:<br>';
+      for (const record of account.history) {
+        message += `${record.date} - ${record.type}: ${record.amount} (balance before: ${record.balanceBefore})<br>`;
+      }
+      displayMessage(message);
+    }
+
+    function displayHistory() {
+      let message = 'History:<br>';
+      for (const record of account.history) {
+        message += `${record.date} - ${record.type}: ${record.amount} (balance before: ${record.balanceBefore})<br>`;
+      }
+      displayMessage(message);
+    }
+
+    function displayMessage(message) {
+      document.getElementById('output').innerHTML = message;
+    }
+    class BankAccount {
+  constructor(accountNumber) {
+    this.accountNumber = accountNumber;
+    this.balance = 0;
+    this.history = [];
+  }
+
+  deposit(amount) {
+    this.balance += amount;
+    this.history.push({
+      date: new Date(),
+      type: 'Deposit',
+      amount: amount,
+      balanceBefore: this.balance - amount
+    });
+  }
+
+  withdraw(amount) {
+    if (this.balance >= amount) {
+      this.balance -= amount;
+      this.history.push({
+        date: new Date(),
+        type: 'Withdraw',
+        amount: amount,
+        balanceBefore: this.balance + amount
+      });
+    } else {
+      console.log('Not enough funds');
+    }
+  }
+
+  displayInfo() {
+    console.log(`Account number: ${this.accountNumber}`);
+    console.log(`Balance: ${this.balance}`);
+    console.log('History: ');
+    for (const record of this.history) {
+      console.log(`${record.date} - ${record.type}: ${record.amount} (balance before: ${record.balanceBefore})`);
+    }
+  }
+
+  displayHistory() {
+    console.log('History: ');
+    for (const record of this.history) {
+      console.log(`${record.date} - ${record.type}: ${record.amount} (balance before: ${record.balanceBefore})`);
+    }
+  }
+}
+
+  </script>
+</html>
